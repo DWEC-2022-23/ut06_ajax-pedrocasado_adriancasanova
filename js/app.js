@@ -109,7 +109,26 @@ document.addEventListener('DOMContentLoaded', () => {
       nameActions[action]();
     }
   });  
-});  
+  //We make an HttpRequest to read the Json
+  const xhttp = new XMLHttpRequest();
+  xhttp.open('GET','./novios.json',true);//We open the Json 
+  xhttp.send();//We send it
+  xhttp.onreadystatechange = function(){
+    if(this.readyState == 4 && this.status == 200){//We check that all is correct
+      let datos = JSON.parse(this.responseText);//We create a variable and we parse the content of the json by responseText
+      for(let objeto of datos){//We create a variable objeto where we put the data of the variable datos
+        const li = createLI(objeto.nombre);//We create a new LI with the name that we have in the json file bu objeto.nombre
+        ul.appendChild(li);//We added to the ul
+        if(objeto.confirmado == true){//We check if the checkbox is checked or no by the information we have in the json file
+          let li = document.getElementsByTagName("li");//We go through the li
+          li[1].className="responded";// We gave the li a class name responded
+          li[1].getElementsByTagName("input")[0].checked=true;//We manually check the checkbox by using checked=true
+         }
+      }
+    }
+  }
+});
+
   
   
   
