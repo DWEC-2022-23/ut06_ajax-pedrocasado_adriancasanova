@@ -1,14 +1,11 @@
 {
-  "name": "bodas",
+  "name": "json",
   "version": "1.0.0",
-  "description": "app bodas",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Carlos Tessier",
-  "license": "ISC",
-  "dependencies": {
-    "json-server": "^0.17.1"
-  }
+  "author": "",
+  "license": "ISC"
 }
