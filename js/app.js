@@ -1,3 +1,4 @@
+const fichero = new URL("http://localhost:3000/invitados");
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('registrar');
   const input = form.querySelector('input');
@@ -60,8 +61,18 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     const text = input.value;
     input.value = '';
-    const li = createLI(text);
+
+    const xhttp = new XMLHttpRequest();
+
+    xhttp.open('POST',fichero,true);//We open the Json 
+
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    let invitado = JSON.stringify({"id": 0, "nombre": text, "confirmado": false });// We create a new Json object by stringify
+    xhttp.send(invitado);//We send it
+
+    li = createLI(text);
     ul.appendChild(li);
+    location.reload();
   });
     
   ul.addEventListener('change', (e) => {
@@ -71,8 +82,30 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (checked) {
       listItem.className = 'responded';
+      let nombre=listItem.getElementsByTagName("span")[0].textContent;
+      id= listItem.id;// We create a variable id with the id of the listItem
+      let dato= document.getElementById(id);
+      let confirmed = dato.getElementsByTagName("input")[0].checked;
+      const xhttp = new XMLHttpRequest();
+      xhttp.open('PUT',fichero+"/"+id,true);//We open the Json;
+      xhttp.setRequestHeader("Content-Type", "application/json");
+      let invitado = JSON.stringify({"id": id,"nombre":nombre,"confirmado": confirmed });
+      xhttp.send(invitado);//We send it
+      setTimeout(function(){
+        window.location.reload();
+     }, 2000);
     } else {
       listItem.className = '';
+      let nombre=listItem.getElementsByTagName("span")[0].textContent;
+      id = listItem.id;// We create a variable id with the id of the listItem
+      const xhttp = new XMLHttpRequest();
+      xhttp.open('PUT',fichero+"/"+id,true);//We open the Json;
+      xhttp.setRequestHeader("Content-Type", "application/json");//We set the headers
+      let invitado = JSON.stringify({"id": id,"nombre":nombre,"confirmado": false });//We create a json object
+      xhttp.send(invitado);//We send it
+      setTimeout(function(){
+        window.location.reload();
+     }, 2000);//We set a timeout of 2 seconds and we reload the page
     }
   });
     
@@ -85,6 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const nameActions = {
         remove: () => {
           ul.removeChild(li);
+          id= li.id;// We create a variable id with the id of the li
+          const xhttp = new XMLHttpRequest();
+          xhttp.open('DELETE',fichero+"/"+id,true);//We open the Json and delete the object by id
+          xhttp.send();//We send it
+    
         },
         edit: () => {
           const span = li.firstElementChild;
@@ -101,7 +139,16 @@ document.addEventListener('DOMContentLoaded', () => {
           span.textContent = input.value;
           li.insertBefore(span, input);
           li.removeChild(input);
-          button.textContent = 'edit';        
+          button.textContent = 'edit';
+          id= li.id;// We create a variable id with the id of the li
+          let dato= document.getElementById(id);// We create a variable dato with the content of the element with the id
+          let confirmed = dato.getElementsByTagName("input")[0].checked;//We save the status of the checkbox in a variable
+          const xhttp = new XMLHttpRequest();
+          xhttp.open('PUT',fichero+"/"+id,true);//We open the Json;
+          xhttp.setRequestHeader("Content-Type", "application/json");//We set the headers
+          let invitado = JSON.stringify({"id": id, "nombre": span.textContent, "confirmado": confirmed });// We create a json object
+          xhttp.send(invitado);//We send it    
+          location.reload();// We reload the page
         }
       };
       
@@ -109,13 +156,25 @@ document.addEventListener('DOMContentLoaded', () => {
       nameActions[action]();
     }
   });  
+  //We make an HttpRequest to read the Json
+  const xhttp = new XMLHttpRequest();
+  xhttp.open('GET',fichero,true);//We open the Json 
+  xhttp.onreadystatechange = function(){
+    if(this.readyState == 4 && this.status == 200){//We check that all is correct
+      let datos = JSON.parse(this.responseText);//We create a variable and we parse the content of the json by responseText
+      for(let objeto of datos){//We create a variable objeto where we put the data of the variable datos
+        const li = createLI(objeto.nombre);//We create a new LI with the name that we have in the json file bu objeto.nombre
+        li.id=objeto.id;
+        id=li.id;
+        li.confirmado=objeto.confirmado;
+        ul.appendChild(li);//We added to the ul
+        if(objeto.confirmado == true){//We check if the checkbox is checked or no by the information we have in the json file
+          let li = document.getElementById(id);//We go through the li
+          li.className="responded";// We gave the li a class name responded
+          li.getElementsByTagName("input")[0].checked=true;//We manually check the checkbox by using checked=true
+         }
+      }      
+    }
+  }
+  xhttp.send();//We send it
 });  
-  
-  
-  
-  
-  
-  
-  
-  
-  
