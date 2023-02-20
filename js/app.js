@@ -174,8 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
           li.getElementsByTagName("input")[0].checked=true;//We manually check the checkbox by using checked=true
          }
       }      
-    }else{
-      alert("** Error: json-server no esta iniciado")
     }
   }
   xhttp.send();//We send it
